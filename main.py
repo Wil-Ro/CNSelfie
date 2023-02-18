@@ -7,9 +7,10 @@ EdgeMax = 200
 
 
 def showCannyEdge(frame):
-    windowName = "Press w to leave" # this feels messy, fix later
+    windowName = "Result"
     newFrame = cv2.Canny(frame, EdgeMin, EdgeMax)
     while True:
+        cv2.putText(newFrame, "W to close this window", (0, 450), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1, color=(255, 255, 255), thickness=2)
         cv2.imshow(windowName, newFrame)
         if cv2.waitKey(1) == ord('w'):
             cv2.destroyWindow(windowName)
@@ -17,6 +18,7 @@ def showCannyEdge(frame):
 
 def main():
     cap = cv2.VideoCapture(0)
+    liveEdge = False
     if not cap.isOpened:
         raise RuntimeError("Failed to instantiate VideoCapture object :(")
 
@@ -26,12 +28,22 @@ def main():
         if not ret:
             print("##WARNING## - VideoCapture object failed to capture frame")
 
-        cv2.imshow("Press space to take photo", frame)
 
-        if cv2.waitKey(1) == ord(' '):
+        input = cv2.waitKey(1)
+        if input == ord(' '):
             showCannyEdge(frame)
-        if cv2.waitKey(1) == ord('q'):
+        elif input == ord('r'):
+            liveEdge = not liveEdge
+        elif input == ord('q'):
             break
+
+
+        if liveEdge:
+            frame = cv2.Canny(frame, EdgeMin, EdgeMax)
+        cv2.putText(frame, "Space to take photo | R to show edges | Q to quit", (0, 450), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1, color=(255, 255, 255), thickness=2)
+        cv2.imshow("Camera", frame)
+
+        
     
 
     cap.release()
