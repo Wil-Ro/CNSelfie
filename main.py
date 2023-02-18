@@ -2,7 +2,7 @@ import cv2
 import numpy
 import time
 
-EdgeMin = 20
+EdgeMin = 0
 EdgeMax = 200
 
 
