@@ -9,7 +9,9 @@ import svg_to_gcode.svg_parser as Parser
 EdgeMin = 150
 EdgeMax = 200
 
-compiler = Compiler.Compiler(Interfaces.Gcode, movement_speed=1000, cutting_speed=300, pass_depth=5)
+
+
+
 
 # code for function by ospider
 # https://stackoverflow.com/questions/43108751/convert-contour-paths-to-svg-paths
@@ -40,10 +42,67 @@ def contoursToSVG(contours, width, height):
     return result
 
 def contoursToGCode(contours, width, height, filename):
+    compiler = Compiler.Compiler(Interfaces.Gcode, movement_speed=1000, cutting_speed=300, pass_depth=5)
     curves = Parser.parse_string(contoursToSVG(contours, width, height))
     compiler.append_curves(curves)
     compiler.compile_to_file(filename)
     print("success!")
+
+def scaleContours(contours, scale):
+    result = []
+    for contour in contours:
+        resultingContour = []
+        #print(contour)
+        for point in contour:
+            x = int(float(point[0][0])*scale)
+            y = int(float(point[0][1])*scale)
+            resultingPoint = [[x, y]]
+            resultingContour.append(resultingPoint)
+        result.append(resultingContour)
+    #print(result)
+    return result
+
+def getMin(a, b):
+    if a <= -1:
+        return b
+    elif b <= -1:
+        return a
+    elif a < b:
+        return a
+    else:
+        return b
+
+def calculateDrift(contours):
+    xDrift = -1
+    yDrift = -1
+
+    for contour in contours:
+        for point in contour:
+            xDrift = getMin(point[0][0], xDrift)
+            yDrift = getMin(point[0][1], yDrift)
+    
+    return xDrift, yDrift
+
+
+
+def correctContours(contours):
+    result = []
+
+    x, y = calculateDrift(contours)
+
+    for contour in contours:
+        resultingContour = []
+        #print(contour)
+        for point in contour:
+            #print(point)
+            resultingX = point[0][0]-x
+            resultingY = point[0][1]-y
+            resultingPoint = [[resultingX, resultingY]]
+            resultingContour.append(resultingPoint)
+        result.append(resultingContour)
+    #print(result)
+    return result
+
 
 # displays a single frame ready to print
 def Capture(frame):
@@ -59,7 +118,15 @@ def Capture(frame):
         elif input == ord('e'):
             # Do I really have to save then rewrite the file for this...
             contours, hierachy = cv2.findContours(frame, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            contoursToGCode(contours, frame.shape[0], frame.shape[1], "test.gcode")
+            print(contours[0])
+            contoursToGCode(contours, frame.shape[0], frame.shape[1], "testBefore.gcode")
+            contours = correctContours(contours)
+            print(contours[0])
+            contoursToGCode(contours, frame.shape[0], frame.shape[1], "testMiddle.gcode")
+            contours = scaleContours(contours, 0.5)
+            contoursToGCode(contours, frame.shape[0], frame.shape[1], "testAfter.gcode")
+
+
 def main():
     cap = cv2.VideoCapture(0)
     liveCanny = False
