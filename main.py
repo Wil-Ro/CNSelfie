@@ -71,24 +71,32 @@ def getMin(a, b):
         return a
     else:
         return b
+    
+def getMax(a, b):
+    if a > b:
+        return a
+    else:
+        return b
 
-def calculateDrift(contours):
+def calculateDrift(contours, frame):
     xDrift = -1
     yDrift = -1
 
     for contour in contours:
         for point in contour:
             xDrift = getMin(point[0][0], xDrift)
-            yDrift = getMin(point[0][1], yDrift)
+            yDrift = getMax(point[0][1], yDrift)
     
+    yDrift -= frame.shape[1] #idk what james was on but i want some
+
     return xDrift, yDrift
 
 
 
-def correctContours(contours):
+def correctContours(contours, frame):
     result = []
 
-    x, y = calculateDrift(contours)
+    x, y = calculateDrift(contours, frame)
 
     for contour in contours:
         resultingContour = []
@@ -120,10 +128,10 @@ def Capture(frame):
             contours, hierachy = cv2.findContours(frame, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             print(contours[0])
             contoursToGCode(contours, frame.shape[0], frame.shape[1], "testBefore.gcode")
-            contours = correctContours(contours)
+            contours = scaleContours(contours, 0.5)
             print(contours[0])
             contoursToGCode(contours, frame.shape[0], frame.shape[1], "testMiddle.gcode")
-            contours = scaleContours(contours, 0.5)
+            contours = correctContours(contours, frame)
             contoursToGCode(contours, frame.shape[0], frame.shape[1], "testAfter.gcode")
 
 
