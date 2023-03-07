@@ -1,0 +1,27 @@
+    M00 – Program stop
+    M02 – End of program
+    M03 – Spindle ON – clockwise
+    M04 – Spindle ON – counterclockwise
+    M05 – Spindle stop
+    M06 – Tool change
+    M08 – Flood colant ON
+    M09 – Flood colant OFF
+    M30 – End of program
+
+    G00 - Move as fast as possible to location
+    G01 - Linear Interpolation
+    G02 - Circular Interpolation Clockwise
+    G03 - Circular Interpolation Counterclockwise
+
+    G17-19 - set plane to work on
+        G17 – XY plane
+        G18 – XZ plane
+        G19 – YZ plane
+    G20 - Set units to Inches
+    G21 - Set units to mm
+
+    G28 - Home
+    G29 - Bed Levelling
+
+    official docs:
+    https://machmotion.com/downloads/GCode/Mach3-GCode-Language-Reference.pdf
