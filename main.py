@@ -42,7 +42,7 @@ def contoursToSVG(contours, width, height):
     return result
 
 def contoursToGCode(contours, width, height, filename):
-    compiler = Compiler.Compiler(Interfaces.Gcode, movement_speed=1000, cutting_speed=300, pass_depth=1) 
+    compiler = Compiler.Compiler(Interfaces.Gcode, movement_speed=2000, cutting_speed=2000, pass_depth=1) 
     curves = Parser.parse_string(contoursToSVG(contours, width, height))
     compiler.append_curves(curves)
     compiler.compile_to_file(filename)
@@ -124,7 +124,7 @@ def Capture(frame):
         elif input == ord('e'):
             # Do I really have to save then rewrite the file for this...
             contours, hierachy = cv2.findContours(frame, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            contours = scaleContours(contours, 0.5)
+            contours = scaleContours(contours, 0.25)
             contours = correctContours(contours, frame)
             contoursToGCode(contours, frame.shape[0], frame.shape[1], "test.gcode")
 
